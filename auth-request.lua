@@ -113,7 +113,11 @@ core.register_action("auth-request", { "http-req" }, function(txn, be, path)
 		txn:set_var("txn.auth_response_code", c)
 		txn:set_var("txn.auth_response_email", h["x-auth-request-email"])
 		txn:set_var("txn.auth_response_user", h["x-auth-request-user"])
-		txn:set_var("txn.auth_response_id_token", h["x-auth-request-id-token"])
+		if h["authorization"] ~= nil then
+			txn:set_var("txn.authorization", h["authorization"])
+			id_token = string.gsub(h["authorization"], "Bearer ", "", 1)
+			txn:set_var("txn.auth_response_id_token", id_token)
+		end
 
 	-- 401 / 403: Do not allow request.
 	elseif c == 401 or c == 403 then
